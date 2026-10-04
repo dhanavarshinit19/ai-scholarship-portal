@@ -1,0 +1,21 @@
+{
+  "name": "ai-scholarship-portal",
+  "version": "1.0.0",
+  "description": "AI-powered scholarship verification portal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhanavarshinit19/ai-scholarship-portal.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/dhanavarshinit19/ai-scholarship-portal/issues"
+  },
+  "homepage": "https://github.com/dhanavarshinit19/ai-scholarship-portal#readme"
+}
