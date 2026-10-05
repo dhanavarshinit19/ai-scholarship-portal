@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
-from database import get_connection, create_table
+from backend.database import get_connection, create_table
 
 import os
 import re

@@ -4,7 +4,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "ocr"))
 
 from ocr import extract_text, extract_details
-from document_rules import get_required_fields
+from ai.verification.document_rules import get_required_fields
 
 
 def verify_document(application, document, document_type):
