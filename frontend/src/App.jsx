@@ -26,6 +26,7 @@ function App() {
   const [saved, setSaved] = useState([]);
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState({});
+  const [uploading, setUploading] = useState(false);
   const [applications, setApplications] = useState([]);
   const [role, setRole] = useState("Student");
 
@@ -228,22 +229,101 @@ function App() {
         return (
           <section className="form-card">
             <h1>Document Upload & AI Verification</h1>
-            <p>Choose your documents to prepare them for verification.</p>
-            {["10th Certificate", "12th Certificate", "Aadhaar", "Income Certificate", "Community Certificate"].map((name) => (
+            <p>Select the required documents. PDF, PNG, or JPG files only; maximum 5 MB per file.</p>
+
+            {[
+              "10th Certificate",
+              "12th Certificate",
+              "Aadhaar",
+              "Income Certificate",
+              "Community Certificate",
+            ].map((name) => (
               <label className="upload-row" key={name}>
                 {name}
-                <input type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={(e) =>
-                  setFiles((old) => ({ ...old, [name]: e.target.files[0]?.name || "" }))
-                } />
-                {files[name] && <small>Selected: {files[name]}</small>}
+                <input
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+
+                    if (!file) {
+                      setFiles((old) => {
+                        const updated = { ...old };
+                        delete updated[name];
+                        return updated;
+                      });
+                      return;
+                    }
+
+                    const allowedTypes = [
+                      "application/pdf",
+                      "image/png",
+                      "image/jpeg",
+                    ];
+
+                    if (!allowedTypes.includes(file.type)) {
+                      notify("Please select a PDF, PNG, or JPG file.");
+                      e.target.value = "";
+                      return;
+                    }
+
+                    if (file.size > 5 * 1024 * 1024) {
+                      notify("Each file must be 5 MB or smaller.");
+                      e.target.value = "";
+                      return;
+                    }
+
+                    setFiles((old) => ({ ...old, [name]: file }));
+                    notify("");
+                  }}
+                />
+
+                {files[name] && (
+                  <small>Selected: {files[name].name}</small>
+                )}
               </label>
             ))}
-            <button className="primary" onClick={() => notify("Demo only: connect the document upload API to run real AI verification.")}>Submit for Verification</button>
+
+            <button
+              className="primary"
+              disabled={uploading}
+              onClick={() => {
+                const requiredDocs = [
+                  "10th Certificate",
+                  "12th Certificate",
+                  "Aadhaar",
+                  "Income Certificate",
+                  "Community Certificate",
+                ];
+
+                const missingDocs = requiredDocs.filter(
+                  (name) => !files[name]
+                );
+
+                if (missingDocs.length > 0) {
+                  notify(
+                    "Please upload all required documents: " +
+                      missingDocs.join(", ")
+                  );
+                  return;
+                }
+
+                notify(
+                  "Documents selected and validated. Actual upload and AI verification require the backend API."
+                );
+              }}
+            >
+              {uploading ? "Uploading..." : "Submit for Verification"}
+            </button>
+
             {message && <p className="success">{message}</p>}
-            <p className="status pending">PENDING — real AI verification is not connected.</p>
+
+            <p className="status pending">
+              Awaiting backend upload and AI verification.
+            </p>
           </section>
         );
-
+      
       case "Bank Details":
         return (
           <section className="form-card">
@@ -314,7 +394,7 @@ function App() {
         </div>
       </header>
       <main>{renderPage()}</main>
-      <footer><strong>ScholarAI</strong><p>AI-Powered Scholarship Portal · Frontend Demo</p></footer>
+      <footer><strong>ScholarAI</strong><p>AI-Powered Scholarship Portal </p></footer>
     </div>
   );
 }
