@@ -1,223 +1,96 @@
-* {
-  box-sizing: border-box;
+* { box-sizing: border-box; }
+:root {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: #17213c;
+  background: #f7f9ff;
+  font-synthesis: none;
 }
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f7f9fc;
-  color: #172033;
-}
-
-.app {
-  min-height: 100vh;
-}
-
+body { margin: 0; min-width: 320px; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+.app { min-height: 100vh; }
 .navbar {
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 8%;
-  background: white;
-  border-bottom: 1px solid #e8ebf0;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 18px; padding: 15px 5%; background: #fff;
+  border-bottom: 1px solid #e5eaf5; flex-wrap: wrap;
 }
-
-.logo {
-  font-size: 22px;
-  font-weight: 700;
+.brand {
+  border: 0; background: transparent; font-size: 22px;
+  font-weight: 800; color: #315cff;
 }
-
-.logo span {
-  margin-right: 8px;
+nav, .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+nav button, .nav-actions button, .secondary {
+  background: #fff; border: 1px solid #dbe2f0; color: #263653;
+  padding: 10px 13px; border-radius: 8px;
 }
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 28px;
+nav button:hover, .secondary:hover { background: #eef2ff; }
+.primary {
+  background: #315cff; color: #fff; border: 1px solid #315cff;
+  border-radius: 8px; padding: 11px 17px;
 }
-
-.nav-links a {
-  text-decoration: none;
-  color: #4b5563;
+.primary:hover { background: #2347db; }
+.hero {
+  padding: 75px 8%; min-height: 400px; display: grid;
+  grid-template-columns: 1.4fr .8fr; align-items: center; gap: 45px;
+  background: linear-gradient(130deg, #edf2ff, #fff);
 }
-
-.nav-links button {
-  border: none;
-  background: #315efb;
-  color: white;
-  padding: 11px 22px;
-  border-radius: 8px;
-  cursor: pointer;
+.eyebrow { color: #315cff; font-size: 12px; letter-spacing: 2px; font-weight: 800; }
+.hero h1 { font-size: clamp(34px, 5vw, 55px); line-height: 1.12; margin: 20px 0; }
+.hero h1 span { color: #315cff; }
+.hero p, .section > p { color: #65718a; line-height: 1.8; }
+.hero .secondary { margin-left: 10px; }
+.hero-card, .form-card, .feature-card, .scholarship-card, .stat-card {
+  background: white; border: 1px solid #e2e8f4; border-radius: 16px;
+  padding: 25px; box-shadow: 0 8px 28px #20365b0a;
 }
-
-.hero-section {
-  min-height: 570px;
-  padding: 80px 8%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 60px;
-  background: linear-gradient(135deg, #eef3ff, #ffffff);
+.hero-card { text-align: center; max-width: 340px; justify-self: center; }
+.robot { font-size: 48px; }
+.progress { height: 8px; background: #e7ecfa; border-radius: 20px; margin: 22px 0 10px; }
+.progress span { display: block; height: 100%; width: 80%; background: #315cff; border-radius: 20px; }
+.section { padding: 45px 6%; }
+.section h1, .section > h2 { margin-top: 0; }
+.section > h2 { text-align: center; margin-bottom: 28px; }
+.feature-grid, .scholarship-grid, .stats-grid {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;
 }
-
-.hero-content {
-  max-width: 650px;
+.feature-card > span { font-size: 27px; }
+.feature-card h3, .scholarship-card h3 { margin-bottom: 8px; }
+.feature-card p, .scholarship-card p { color: #69758c; line-height: 1.6; }
+.how { text-align: center; background: #edf2ff; }
+.form-card { max-width: 720px; margin: 40px auto; }
+.form-card h1 { margin-top: 0; }
+.form-card form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px; }
+.form-card label { display: flex; flex-direction: column; gap: 8px; color: #34415d; font-size: 14px; }
+.form-card input, .search, .nav-actions select {
+  width: 100%; padding: 12px; border: 1px solid #d9e1ef;
+  border-radius: 8px; background: white; color: #17213c;
 }
-
-.tagline {
-  color: #315efb;
-  font-size: 14px;
-  font-weight: bold;
-  letter-spacing: 2px;
+.form-card form button { align-self: end; }
+.search { max-width: 380px; margin: 0 10px 25px 0; }
+.scholarship-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.scholarship-card h2 { color: #315cff; }
+.tag { display: inline-block; color: #315cff; background: #eef2ff; padding: 6px 10px; border-radius: 20px; font-size: 12px; }
+.card-actions { display: flex; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
+.card-actions button { border: 1px solid #dbe2f0; border-radius: 7px; background: white; padding: 9px; }
+.full { width: 100%; }
+.stats-grid { margin: 25px 0; }
+.stat-card h2 { color: #315cff; font-size: 32px; }
+.upload-row { margin: 18px 0; }
+.upload-row input { margin-top: 8px; }
+.success { color: #14804a; background: #eaf9f0; padding: 12px; border-radius: 8px; }
+.status { display: inline-block; padding: 8px 12px; border-radius: 7px; font-size: 13px; }
+.pending { color: #936100; background: #fff3cd; }
+footer { padding: 28px 6%; background: #17213c; color: white; }
+footer p { color: #ccd4e5; }
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; padding: 50px 6%; }
+  .feature-grid, .scholarship-grid, .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-
-.hero-content h1 {
-  font-size: 60px;
-  line-height: 1.05;
-  margin: 20px 0;
-}
-
-.hero-content h1 span {
-  color: #315efb;
-}
-
-.description {
-  color: #5f6877;
-  font-size: 18px;
-  line-height: 1.7;
-  max-width: 560px;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 15px;
-  margin-top: 30px;
-}
-
-.primary-btn,
-.secondary-btn {
-  padding: 14px 24px;
-  border-radius: 9px;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-.primary-btn {
-  border: none;
-  background: #315efb;
-  color: white;
-}
-
-.secondary-btn {
-  background: white;
-  border: 1px solid #d9deea;
-  color: #172033;
-}
-
-.hero-card {
-  width: 330px;
-  padding: 35px;
-  border-radius: 20px;
-  background: white;
-  box-shadow: 0 20px 50px rgba(39, 61, 112, 0.12);
-}
-
-.card-icon {
-  font-size: 45px;
-}
-
-.hero-card h2 {
-  margin-bottom: 8px;
-}
-
-.hero-card p {
-  color: #687386;
-  line-height: 1.6;
-}
-
-.match {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 30px;
-  font-size: 14px;
-}
-
-.match strong {
-  color: #315efb;
-}
-
-.progress {
-  height: 9px;
-  background: #e8ecf5;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-.progress div {
-  width: 92%;
-  height: 100%;
-  background: #315efb;
-  border-radius: 10px;
-}
-
-.features {
-  padding: 70px 8%;
-  text-align: center;
-  background: white;
-}
-
-.features h2 {
-  font-size: 32px;
-  margin-bottom: 45px;
-}
-
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 25px;
-}
-
-.feature-card {
-  padding: 30px;
-  border: 1px solid #e7eaf0;
-  border-radius: 15px;
-  text-align: left;
-}
-
-.feature-card span {
-  font-size: 30px;
-}
-
-.feature-card h3 {
-  margin-bottom: 10px;
-}
-
-.feature-card p {
-  color: #687386;
-  line-height: 1.6;
-}
-
-@media (max-width: 800px) {
-  .hero-section {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .hero-content h1 {
-    font-size: 42px;
-  }
-
-  .hero-buttons {
-    justify-content: center;
-  }
-
-  .nav-links a {
-    display: none;
-  }
-
-  .feature-grid {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 600px) {
+  .navbar { align-items: flex-start; }
+  nav, .nav-actions { width: 100%; }
+  nav button { flex: 1; }
+  .feature-grid, .scholarship-grid, .stats-grid, .form-card form { grid-template-columns: 1fr; }
+  .hero .secondary { margin: 12px 0 0; }
+  .section { padding: 30px 5%; }
 }
