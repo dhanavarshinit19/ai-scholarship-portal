@@ -1,12 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
-const scholarships = [
-  { id: 1, name: "National Merit Scholarship", provider: "Government of India", amount: "₹50,000", category: "Merit", deadline: "30 Nov 2026" },
-  { id: 2, name: "AI & Data Science Excellence", provider: "Tech Education Foundation", amount: "₹75,000", category: "Technology", deadline: "15 Dec 2026" },
-  { id: 3, name: "Women in Technology Scholarship", provider: "Future Tech Foundation", amount: "₹1,00,000", category: "Women in STEM", deadline: "20 Dec 2026" },
-  { id: 4, name: "Future Innovators Scholarship", provider: "Innovation Foundation", amount: "₹40,000", category: "Innovation", deadline: "25 Jan 2027" },
-];
+
 
 const studentPages = [
   "Dashboard", "Profile", "Scholarships", "My Applications",
@@ -20,6 +15,7 @@ const adminPages = [
 
 function App() {
   const [page, setPage] = useState("Home");
+  const [scholarships, setScholarships] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [selected, setSelected] = useState(null);
@@ -29,6 +25,7 @@ function App() {
   const [uploading, setUploading] = useState(false);
   const [applications, setApplications] = useState([]);
   const [role, setRole] = useState("Student");
+  const [currentStudent, setCurrentStudent] = useState(null);
 
   const go = (next) => {
     setPage(next);
@@ -37,46 +34,147 @@ function App() {
   };
 
   const notify = (text) => setMessage(text);
+  
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/scholarships")
+      .then((response) => response.json())
+      .then((data) => {
+        setScholarships(
+          data.map((s) => ({
+            ...s,
+            category: s.category || s.eligibility || "General",
+            provider: s.provider || "Scholarship Provider",
+            deadline: s.deadline || s.last_date || "Not specified",
+          }))
+        );
+      })
+      .catch((error) => {
+        console.error("Failed to load scholarships:", error);
+      });
+  }, []);
 
   const visibleScholarships = scholarships.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase()) &&
     (category === "All" || s.category === category)
   );
 
-  function submitForm(e, success) {
-    e.preventDefault();
-    notify(success);
+  
+async function submitForm(e, success, values) {
+  e.preventDefault();
+
+  const form = e.currentTarget;
+  const title = form.closest(".form-card")?.querySelector("h1")?.textContent;
+
+  try {
+    if (title === "Create Your Account") {
+      if (values["Password"] !== values["Confirm Password"]) {
+        notify("Passwords do not match.");
+        return;
+      }
+
+      const response = await fetch("http://127.0.0.1:8000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: values["Full Name"],
+          email: values["Email"],
+          password: values["Password"],
+        }),
+      });
+
+      const data = await response.json();
+
+      
+      if (!response.ok || data.message === "Invalid email or password") {
+        notify(data.message || "Login failed.");
+        return;
+    }
+
+      notify(data.message || "Registration completed.");
+      return;
+    }
+
+    if (title === "Welcome Back") {
+      const response = await fetch("http://127.0.0.1:8000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: values["Email"],
+          password: values["Password"],
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.message === "Invalid email or password") {
+        notify(data.message || "Login failed.");
+        return;
+      }
+
+      setCurrentStudent(data);
+      notify("Login successful.");
+      go("Dashboard");
+      return;
+    }
+
+    notify(success || "Submitted.");
+  } catch (error) {
+    console.error(error);
+    notify("Cannot connect to backend. Check whether the backend server is running.");
   }
+}
 
   function openApplication(scholarship) {
     setSelected(scholarship);
     go("Application");
   }
 
-  function renderForm(title, fields, success) {
-    return (
-      <section className="form-card">
-        <h1>{title}</h1>
-        <p>Enter your details below.</p>
-        <form onSubmit={(e) => submitForm(e, success)}>
-          {fields.map((field) => (
-            <label key={field}>
-              {field}
-              <input
-                required
-                type={field.toLowerCase().includes("password") ? "password" :
-                  field.toLowerCase().includes("email") ? "email" :
-                  field.toLowerCase().includes("date") ? "date" : "text"}
-                placeholder={`Enter ${field.toLowerCase()}`}
-              />
-            </label>
-          ))}
-          <button className="primary" type="submit">Submit</button>
-        </form>
-        {message && <p className="success">{message}</p>}
-      </section>
-    );
-  }
+  
+function renderForm(title, fields, success) {
+  return (
+    <section className="form-card">
+      <h1>{title}</h1>
+      <p>Enter your details below.</p>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+
+          const formData = new FormData(e.currentTarget);
+          const values = Object.fromEntries(formData.entries());
+
+          submitForm(e, success, values);
+        }}
+      >
+        {fields.map((field) => (
+          <label key={field}>
+            {field}
+            <input
+              name={field}
+              required
+              type={
+                field.toLowerCase().includes("password")
+                  ? "password"
+                  : field.toLowerCase().includes("email")
+                  ? "email"
+                  : field.toLowerCase().includes("date")
+                  ? "date"
+                  : "text"
+              }
+              placeholder={`Enter ${field.toLowerCase()}`}
+            />
+          </label>
+        ))}
+
+        <button className="primary" type="submit">
+          Submit
+        </button>
+      </form>
+
+      {message && <p className="success">{message}</p>}
+    </section>
+  );
+}
 
   function scholarshipCards(list) {
     return (
@@ -146,13 +244,12 @@ function App() {
         );
 
       case "Login":
-        return renderForm("Welcome Back", ["Email", "Password"], "Demo login submitted. Backend authentication is not connected yet.");
-
+       return renderForm("Welcome Back", ["Email", "Password"], "");
       case "Register":
         return renderForm("Create Your Account", [
           "Full Name", "Email", "Mobile Number", "Password",
           "Confirm Password", "Date of Birth", "Gender", "Category", "State", "District",
-        ], "Demo registration submitted. Backend registration is not connected yet.");
+        ], "");
 
       case "Dashboard":
       case "Admin Dashboard":
@@ -161,6 +258,13 @@ function App() {
             <span className="eyebrow">{role.toUpperCase()} PORTAL</span>
             <h1>Welcome to {page}</h1>
             <p>Track scholarship progress from one place.</p>
+            {page === "Dashboard" && currentStudent && (
+              <div className="stat-card">
+                <h2>Welcome, {currentStudent.name}!</h2>
+                <p>Student ID: {currentStudent.student_id}</p>
+                <p>Email: {currentStudent.email}</p>
+              </div>
+            )}
             <div className="stats-grid">
               {[
                 ["Total Applications", applications.length],
@@ -214,7 +318,7 @@ function App() {
                 id: Date.now(), name: selected?.name || "Scholarship Application",
                 date: new Date().toLocaleDateString(), status: "Pending",
               }]);
-              notify("Demo application saved in this session.");
+              notify("Application details submitted.");
             }}>
               {["Course", "College", "Year of Study", "Marks / CGPA", "Category", "Annual Family Income", "Address", "State", "District"].map((f) => (
                 <label key={f}>{f}<input required placeholder={`Enter ${f}`} /></label>
@@ -328,7 +432,7 @@ function App() {
         return (
           <section className="form-card">
             <h1>Bank Details</h1>
-            {renderForm("Submit Bank Details", ["Account Holder Name", "Account Number", "Confirm Account Number", "Bank Name", "IFSC Code", "Branch"], "Demo bank form submitted. Real bank verification is not connected.")}
+            {renderForm("Submit Bank Details", ["Account Holder Name", "Account Number", "Confirm Account Number", "Bank Name", "IFSC Code", "Branch"], "")}
           </section>
         );
 
@@ -348,7 +452,7 @@ function App() {
         );
 
       case "Profile":
-        return renderForm("Student Profile", ["Full Name", "Email", "Mobile Number", "Course", "College", "Year of Study", "Category", "Annual Family Income", "State", "District"], "Demo profile form submitted.");
+        return renderForm("Student Profile", ["Full Name", "Email", "Mobile Number", "Course", "College", "Year of Study", "Category", "Annual Family Income", "State", "District"], "");
 
       case "Notifications":
         return <section className="section"><h1>Notifications</h1>{[
@@ -386,7 +490,7 @@ function App() {
           <button onClick={() => go("Notifications")}>Notifications</button>
         </nav>
         <div className="nav-actions">
-          <select aria-label="Demo role" value={role} onChange={(e) => setRole(e.target.value)}>
+          <select aria-label="User role" value={role} onChange={(e) => setRole(e.target.value)}>
             <option>Student</option><option>Admin</option>
           </select>
           <button className="primary" onClick={() => go("Login")}>Login</button>
